@@ -1,30 +1,10 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter , HTTPException
+from app.db.db import store
+from app.models.items import Item
 
-app = FastAPI()
+router = APIRouter()
 
-store = {}  # Simple in-memory key-value store for items
-
-class Item(BaseModel):
-    """
-    Data model for an item.
-    Attributes:
-        name (str): Name of the item (required).
-        description (str, optional): Optional description of the item.
-    """
-    name: str
-    description: str = None
-
-@app.get("/")
-def root():
-    """
-    Home route to confirm server is running.
-    """
-    return {"message": "✅ Server running at http://127.0.0.1:8000/"}
-
-
-
-@app.post("/items/{item_id}")
+@router.post("/{item_id}")
 def create_item(item_id: int, item: Item):
     """
     Create a new item with a given ID.
@@ -45,7 +25,7 @@ def create_item(item_id: int, item: Item):
     return {"message": "Item created"}
 
 
-@app.get("/items/{item_id}")
+@router.get("/{item_id}")
 def read_item(item_id: int):
     """
     Retrieve an item by its ID.
@@ -64,7 +44,7 @@ def read_item(item_id: int):
     return store[item_id]
 
 
-@app.put("/items/{item_id}")
+@router.put("/{item_id}")
 def update_item(item_id: int, item: Item):
     """
     Update an existing item by its ID.
@@ -85,7 +65,7 @@ def update_item(item_id: int, item: Item):
     return {"message": "Item updated"}
 
 
-@app.delete("/items/{item_id}")
+@router.delete("/{item_id}")
 def delete_item(item_id: int):
     """
     Delete an item by its ID.
@@ -104,7 +84,7 @@ def delete_item(item_id: int):
     del store[item_id]
     return {"message": "Item deleted"}
 
-@app.get("/items")
+@router.get("/")
 def get_all_items():
     """
     Return all items in the store.
