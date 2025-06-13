@@ -30,11 +30,19 @@ A simple FastAPI-based CRUD API using in-memory storage. It provides endpoints t
 
 ```
 fastapi-crud/
-├── venv/                # Virtual environment
-├── main.py              # Main FastAPI application
-├── requirements.txt     # Python dependencies
-├── README.md            # Project documentation
-└── .gitignore           # Git ignored files
+├── venv/                     # Virtual environment
+├── requirements.txt          # Python dependencies
+├── README.md                 # Project documentation
+├── .gitignore                # Git ignored files
+└── app/                      # Main application package
+    ├── main.py               # Entry point for FastAPI
+    ├── api/                  # API-related logic
+    │   └── routes/           # Route handlers
+    │       └── items.py      # Routes for item-related endpoints
+    ├── db/                   # Database connection/config
+    │   └── db.py             # simple database
+    ├── models/               # models
+    │   └── items.py          # Item model definition
 ```
 
 ---
