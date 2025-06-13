@@ -85,7 +85,7 @@ pip install -r requirements.txt
 ## ▶️ Running the App
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
  
 - Server Check: [http://127.0.0.1:8000](http://127.0.0.1:8000)
@@ -130,8 +130,8 @@ uvicorn main:app --reload
 ## 📄 Requirements
 
 ```
-fastapi==0.110.0
-uvicorn==0.29.0
+fastapi==0.115.12
+uvicorn==0.34.3
 ```
 
 > You can install them with:
