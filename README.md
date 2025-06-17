@@ -163,6 +163,8 @@ uvicorn app.main:app --reload
 
 ## 📄 Requirements
 
+### Python Dependencies
+
 ```
 fastapi==0.115.12
 uvicorn==0.34.3
@@ -172,6 +174,18 @@ uvicorn==0.34.3
 >
 > ```bash
 > pip install -r requirements.txt
+> ```
+
+### Required Tools for Docker Setup
+
+* Docker Engine
+* Docker Compose (v2+ recommended)
+
+> To verify installation:
+>
+> ```bash
+> docker --version
+> docker compose version
 > ```
 
 ---
