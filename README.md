@@ -220,9 +220,10 @@ Authorization: Bearer <your-token-here>
 ```
 fastapi==0.115.12
 uvicorn==0.34.3
-python-jose
+python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
+python-multipart
 ```
 
 > Install manually:
