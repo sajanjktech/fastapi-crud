@@ -43,7 +43,9 @@ def authenticate_user(username: str, password: str):
     Returns the user dictionary if authentication is successful, otherwise False.
     """
     user = fake_users_db.get(username)
-    if not user or not verify_password(password, user["hashed_password"]):
+    if not user :
+        return False
+    if not verify_password(password, user["hashed_password"]):
         return False
     return user
 
