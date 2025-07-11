@@ -7,7 +7,6 @@ https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/#update-the-token-path
 """
 
 
-
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from passlib.context import CryptContext
@@ -19,7 +18,6 @@ from dotenv import load_dotenv
 from app.models.auth import UserInDb,Token
 from app.db.db import fake_users_db
 
-# Simulated user database with hashed passwords
 
 load_dotenv()
 

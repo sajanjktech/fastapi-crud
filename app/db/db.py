@@ -1,14 +1,20 @@
-store = {}  
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+store = {}
 
 fake_users_db = {
-    "sajan": {
-        "username": "sajan",
-        "role":"manager",
-        "hashed_password": "$2b$12$xAeFfCFB1cowY23slrkfBOIXUPrlbG7vK52UK3eHXVLO1wkfXvv5y",  # password: secret
+    os.getenv("USER1_USERNAME"): {
+        "username": os.getenv("USER1_USERNAME"),
+        "role": os.getenv("USER1_ROLE"),
+        "hashed_password": os.getenv("USER1_HASHED_PASSWORD"),
     },
-    "sajal": {
-        "username": "sajal",
-        "role":"analyst",
-        "hashed_password": "$2b$12$mtczYF3NJERTEsSD8dCeieZExDqiNkwaijFJ9C0UM1BH0uBcmPZsa",  # password: secret1
+    os.getenv("USER2_USERNAME"): {
+        "username": os.getenv("USER2_USERNAME"),
+        "role": os.getenv("USER2_ROLE"),
+        "hashed_password": os.getenv("USER2_HASHED_PASSWORD"),
     }
 }

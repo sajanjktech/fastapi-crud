@@ -1,9 +1,7 @@
 """
-items management , here the user needs not to be authorised to just see the products but for uploading or to change a product 
-he must be
-
+Items management, here the user needs not to be authorized to just see the products but for uploading or to change a product
+he must be authenticated.
 """
-
 
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -51,7 +49,6 @@ def read_item(item_id: str, username: str = Depends(verify_token)):
     """
     if item_id not in store:
         raise HTTPException(status_code=404, detail="Item not found")
-    print(type(store[item_id]))
     return store[item_id]
 
 @router.put("/{item_id}")
@@ -85,9 +82,8 @@ def delete_item(item_id: str, username: str = Depends(verify_token)):
     Delete an item by its ID.
 
     Args:
-        item_id (int): ID of the item to delete.
-        username (str): Username from the JWT token.
-
+        item_id (int)
+        username (str)
     Returns:
         dict: Success message.
 
@@ -104,14 +100,4 @@ def delete_item(item_id: str, username: str = Depends(verify_token)):
 
 @router.get("/")
 def get_all_items():
-    """
-    Retrieve all items in the store.
-
-    Args:
-        username (str): Username from the JWT token.
-
-    Returns:
-        dict: All items in the in-memory store.
-    """
-
     return store
