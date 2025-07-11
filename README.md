@@ -250,9 +250,26 @@ python-multipart
 
 ## 📦 Notes
 
-* User credentials are hardcoded for testing (see `auth.py`)
-* Data is stored in memory using a dictionary (`store = {}`)
-* JWT tokens and data reset on server restart
-* Fully tested using Swagger UI and Postman
+* ✅ User credentials (username, role, hashed password) are now loaded from the `.env` file instead of hardcoding them in `auth.py`
+* Data is stored in memory using a simple dictionary (`store = {}`) — no external database used
+* JWT tokens and all data will reset when the server restarts (since in-memory storage is used)
+* Fully tested using both Swagger UI and Postman
+* Example `.env` template:
+  
+```env
+# 🔐 User Credentials (Hashed Passwords Only)
 
----
+# User 1
+USER1_USERNAME=your_username1
+USER1_ROLE=your_role1
+USER1_HASHED_PASSWORD=your_hashed_password1  # Use bcrypt hash 
+
+# User 2
+USER2_USERNAME=your_username2
+USER2_ROLE=your_role2
+USER2_HASHED_PASSWORD=your_hashed_password2  # Use bcrypt hash 
+
+# 🔑 JWT Configuration
+SECRET_KEY=your_jwt_secret_key_here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
