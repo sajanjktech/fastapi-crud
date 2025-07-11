@@ -1,25 +1,32 @@
+"""
+This file helps in authentication of user 
+the user provides username and password and if both are correct then access token is sent to the user
+this file is made with the help of fastapi official docs 
+https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/#update-the-token-path-operation
+
+"""
+
+
+
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
+from typing import Annotated
+from datetime import datetime, timedelta, timezone
+from jose import JWTError,jwt
+import os
+from dotenv import load_dotenv
+from app.models.auth import UserInDb,Token
+from app.db.db import fake_users_db
 
 # Simulated user database with hashed passwords
-fake_users_db = {
-    "sajan": {
-        "username": "sajan",
-        "hashed_password": "$2b$12$xAeFfCFB1cowY23slrkfBOIXUPrlbG7vK52UK3eHXVLO1wkfXvv5y",  # password: secret
-    },
-    "sajal": {
-        "username": "sajal",
-        "hashed_password": "$2b$12$mtczYF3NJERTEsSD8dCeieZExDqiNkwaijFJ9C0UM1BH0uBcmPZsa",  # password: secret1
-    }
-}
+
+load_dotenv()
 
 # JWT configuration
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES","30"))
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -36,53 +43,69 @@ def verify_password(plain: str, hashed: str) -> bool:
     """
     return pwd_context.verify(plain, hashed)
 
-def authenticate_user(username: str, password: str):
+def get_user(db,username):
+    if username in db:
+        userdict = db[username]
+        return UserInDb(**userdict)
+
+def authenticate_user(db,username: str, password: str):
     """
     Authenticates a user by username and password.
 
-    Returns the user dictionary if authentication is successful, otherwise False.
     """
-    user = fake_users_db.get(username)
+    user = get_user(db,username)
     if not user :
         return False
-    if not verify_password(password, user["hashed_password"]):
+    if not verify_password(password, user.hashed_password):
         return False
     return user
 
-def create_token(data: dict, expires_delta: timedelta = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta|None = None) -> str:
     """
-    Creates a JWT token with optional expiration time.
 
-    Parameters:
-    - data (dict): Data to encode in the token
-    - expires_delta (timedelta, optional): Token validity duration
+    Creates a JWT token
 
-    Returns:
-    - Encoded JWT token as a string
     """
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    to_encode = data.copy() 
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    print(ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_token(token: str = Depends(oauth2_scheme)) -> str:
+    """
+    Verify JWT token and extract the username (subject).
+
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code = 401,detail = "Invalid token")
+        return username
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 @router.post("/token", summary="User login and JWT generation", tags=["Authentication"])
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
+def login(form_data:Annotated[OAuth2PasswordRequestForm,Depends()])->Token:
     """
     Authenticates user credentials and returns a JWT access token.
-
-    Request Body:
-    - username: User's login name
-    - password: User's password
-
-    Response:
-    - access_token: JWT access token
-    - token_type: Type of token (bearer)
-
     Raises:
     - HTTP 401 if authentication fails
     """
-    user = authenticate_user(form_data.username, form_data.password)
+    user = authenticate_user(fake_users_db,form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    token = create_token(data={"sub": user["username"]})
-    return {"access_token": token, "token_type": "bearer"}
+    
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=access_token_expires
+    )
+    return Token(access_token= access_token,token_type="bearer")

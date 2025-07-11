@@ -1,1 +1,64 @@
-__pycache__/
+# Python cache and compiled files
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+**/*.so
+
+# Virtual environments (anywhere in the project)
+**/venv/
+**/.venv/
+
+
+# IDE/editor files
+**/.vscode/
+**/.idea/
+**/*.sublime-project
+**/*.sublime-workspace
+
+# Logs
+**/*.log
+**/*.pid
+**/*.out
+
+# Databases
+**/*.sqlite3
+**/*.db
+
+# Alembic migrations (ignore cache/pyc inside, keep migration scripts if needed)
+**/migrations/__pycache__/
+**/migrations/*.pyc
+**/migrations/env.pyc
+**/migrations/versions/*.pyc
+
+# Test and coverage artifacts
+**/.pytest_cache/
+**/.mypy_cache/
+**/.coverage
+**/htmlcov/
+**/coverage.xml
+**/.tox/
+**/*.cover
+**/nosetests.xml
+
+# PyInstaller
+**/dist/
+**/build/
+**/*.spec
+
+# Wheels
+**/*.whl
+
+# Python PEP 582
+**/__pypackages__/
+
+# Static/media files (if using FastAPI static mounts)
+**/staticfiles/
+**/media/
+
+# Jupyter
+**/.ipynb_checkpoints/
+
+# OS-specific files
+**/.DS_Store
+**/Thumbs.db

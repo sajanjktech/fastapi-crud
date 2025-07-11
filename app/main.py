@@ -19,8 +19,11 @@ def root():
     """
     env = os.getenv("APP_ENV", "development")
     port = os.getenv("APP_PORT", "8000")
-    return {"message": f"✅ {app.title} running in {env} mode on port {port}."}
+    for key, value in os.environ.items():
+        print(f"{key} = {value}")
+    return {"message": f"{app.title} running in {env} mode on port {port}."}
 
 # Register authentication and item management routes
-app.include_router(auth.router)  # Provides /token endpoint for JWT login
+app.include_router(auth.router)  
+# Provides /token endpoint for JWT login
 app.include_router(items.router, prefix="/items", tags=["Items"])

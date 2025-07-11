@@ -20,8 +20,8 @@ A secure FastAPI-based CRUD API using in-memory storage and JWT authentication. 
 * **JWT Authentication** with login and access token
 * **Create Item (POST)** – Add an item with a name and optional description
 * **Read Item (GET)** – Retrieve a specific item by ID
-* **Update Item (PUT)** – Update an existing item by ID
-* **Delete Item (DELETE)** – Remove an item by ID
+* **Update Item (PUT)** – Update an existing item by ID for the user who uploaded it
+* **Delete Item (DELETE)** – Remove an item by ID for the user who uploaded it
 * **List All Items (GET)** – Retrieve all stored items
 * **Validation & Error Handling**:
   * Prevents duplicate item creation using the same ID

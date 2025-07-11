@@ -1,36 +1,20 @@
+"""
+items management , here the user needs not to be authorised to just see the products but for uploading or to change a product 
+he must be
+
+"""
+
+
+
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from app.db.db import store
-from app.models.items import Item
+from app.models.items import Item,ItemInDb
+from app.api.routes.auth import verify_token
 
 router = APIRouter()
 
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-def verify_token(token: str = Depends(oauth2_scheme)) -> str:
-    """
-    Verify JWT token and extract the username (subject).
-
-    Args:
-        token (str): JWT token passed through the Authorization header.
-
-    Returns:
-        str: Username extracted from the token payload.
-
-    Raises:
-        HTTPException: 401 error if token is invalid or expired.
-    """
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload.get("sub")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
 @router.post("/{item_id}")
-def create_item(item_id: int, item: Item, username: str = Depends(verify_token)):
+def create_item(item_id: str, item: Item, username: str = Depends(verify_token)):
     """
     Create a new item with a given ID.
 
@@ -47,11 +31,11 @@ def create_item(item_id: int, item: Item, username: str = Depends(verify_token))
     """
     if item_id in store:
         raise HTTPException(status_code=400, detail="Item exists")
-    store[item_id] = item
+    store[item_id] = ItemInDb(**item.dict(),username=username)
     return {"message": f"Item created by {username}"}
 
 @router.get("/{item_id}")
-def read_item(item_id: int, username: str = Depends(verify_token)):
+def read_item(item_id: str, username: str = Depends(verify_token)):
     """
     Retrieve an item by its ID.
 
@@ -67,10 +51,11 @@ def read_item(item_id: int, username: str = Depends(verify_token)):
     """
     if item_id not in store:
         raise HTTPException(status_code=404, detail="Item not found")
+    print(type(store[item_id]))
     return store[item_id]
 
 @router.put("/{item_id}")
-def update_item(item_id: int, item: Item, username: str = Depends(verify_token)):
+def update_item(item_id: str, item: Item, username: str = Depends(verify_token)):
     """
     Update an existing item by its ID.
 
@@ -87,11 +72,15 @@ def update_item(item_id: int, item: Item, username: str = Depends(verify_token))
     """
     if item_id not in store:
         raise HTTPException(status_code=404, detail="Item not found")
-    store[item_id] = item
+    item_data = store[item_id]
+    print(type(item_data))
+    if item_data.username != username:
+        raise HTTPException(status_code=401,detail = "You are not authorized")
+    store[item_id] = ItemInDb(**item.dict(),username=username)
     return {"message": f"Item updated by {username}"}
 
 @router.delete("/{item_id}")
-def delete_item(item_id: int, username: str = Depends(verify_token)):
+def delete_item(item_id: str, username: str = Depends(verify_token)):
     """
     Delete an item by its ID.
 
@@ -107,11 +96,14 @@ def delete_item(item_id: int, username: str = Depends(verify_token)):
     """
     if item_id not in store:
         raise HTTPException(status_code=404, detail="Item not found")
+    item_data = store[item_id]
+    if item_data.username!=username:
+        raise HTTPException(status_code=401,detail = "You are not authorized")
     del store[item_id]
     return {"message": f"Item deleted by {username}"}
 
 @router.get("/")
-def get_all_items(username: str = Depends(verify_token)):
+def get_all_items():
     """
     Retrieve all items in the store.
 
@@ -121,4 +113,5 @@ def get_all_items(username: str = Depends(verify_token)):
     Returns:
         dict: All items in the in-memory store.
     """
+
     return store
