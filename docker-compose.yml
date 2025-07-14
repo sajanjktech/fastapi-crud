@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   fastapi-app:
@@ -7,10 +6,10 @@ services:
       dockerfile: Dockerfile
     container_name: ${APP_NAME}
     ports:
-      - "${APP_PORT}:${APP_PORT}"
+      - "${APP_PORT:-8000}:${APP_PORT:-8000}"  # Default fallback if APP_PORT not set
     volumes:
       - ./app:/app/app  # Mount app folder for live reload
-    command: uvicorn app.main:app --host 0.0.0.0 --port ${APP_PORT} --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port ${APP_PORT:-8000} --reload
     restart: unless-stopped
     env_file:
-      - .env
+      - .env1
